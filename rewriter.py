@@ -40,7 +40,7 @@ def rewrite_text(text, service_type, model, full_prompt):
     full_response = response.choices[0].message.content.strip()
 
     output_match = re.search(r"<output>(.*?)</output>", full_response, re.DOTALL)
-    explanation_match = re.search(r"<explanation>(.*?)</explanation>", full_response, re.DOTALL)
+    explanation_match = re.search(r"<explanation>(.*?)(?:</explanation>|$)", full_response, re.DOTALL)
 
     output = remove_xml_tags(output_match.group(1).strip()) if output_match else "未提供输出"
     explanation = remove_xml_tags(explanation_match.group(1).strip()) if explanation_match else "未提供解释"

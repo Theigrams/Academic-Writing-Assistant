@@ -1,138 +1,64 @@
-import difflib
 import os
-import re
 
 import streamlit as st
 import yaml
 
-from academic_rewriter import load_prompts, rewrite_text
+from rewriter import load_prompts, rewrite_text
+from utils import generate_word_diff, set_page_style
 
 
-def load_config():
+def load_api_config():
     with open("api.yaml", "r") as file:
         return yaml.safe_load(file)
 
 
-def generate_word_diff(text1, text2):
-    matcher = difflib.SequenceMatcher(None, text1, text2)
-    result = []
-    for opcode, i1, i2, j1, j2 in matcher.get_opcodes():
-        if opcode == "equal":
-            result.append(text1[i1:i2])
-        elif opcode == "insert":
-            result.append(f"<ins>{text2[j1:j2]}</ins>")
-        elif opcode == "delete":
-            result.append(f"<del>{text1[i1:i2]}</del>")
-        elif opcode == "replace":
-            result.append(f"<del>{text1[i1:i2]}</del>")
-            result.append(f"<ins>{text2[j1:j2]}</ins>")
-    return "".join(result)
-
-
 def main():
-    # 设置全局样式
-    st.markdown(
-        """
-    <style>
-        /* 差异结果样式 */
-        .diff-result {
-            font-family: monospace;
-            white-space: pre-wrap;
-            line-height: 1.5;
-            font-size: 1.0rem;
-        }
-        .diff-result ins {
-            color: #28a745;
-            background-color: #e6ffec;
-            text-decoration: none;
-        }
-        .diff-result del {
-            color: #d73a49;
-            background-color: #ffeef0;
-            text-decoration: line-through;
-        }
-        
-        /* 深色模式适配 */
-        @media (prefers-color-scheme: dark) {
-            .diff-result ins {
-                color: #85e89d;
-                background-color: transparent;
-            }
-            .diff-result del {
-                color: #f97583;
-                background-color: transparent;
-            }
-        }
-    </style>
-    """,
-        unsafe_allow_html=True,
-    )
+    set_page_style()
+    st.title("学术论文GPT")
 
-    st.title("学术文献优化工具")
+    api_cfg = load_api_config()
+    prompts = load_prompts()
 
-    # 加载配置
-    config = load_config()
-
-    # 选择模型
-    model_options = list(config.keys())
-    model = st.selectbox("请选择要使用的模型:", model_options)
-
-    # 加载提示词
-    prompts = load_prompts()  # 使用academic_rewriter.py中定义的load_prompts函数
-
-    # 选择服务类型
+    model = st.selectbox("请选择要使用的模型:", list(api_cfg.keys()))
     service_type = st.selectbox("请选择服务类型:", list(prompts.keys()))
 
-    # 文本输入，添加默认句子
-    default_text = "The cat sat on the mat. It was a sunny day."
+    default_text = "We propose a new family of policy gradient methods for reinforcement learning, which alternate between sampling data through interaction with the environment, and optimizing a “surrogate” objective function using stochastic gradient ascent."
     text = st.text_area("请输入您的文本:", value=default_text, height=200)
-
-    # 添加调试模式复选框
     debug_mode = st.checkbox("调试模式")
 
-    if st.button("提交"):
-        if text:
-            # 从配置文件中获取API设置
-            api_key = config[model]["api_key"]
-            api_base = config[model]["api_base"]
+    if st.button("提交") and text:
+        try:
+            os.environ["OPENAI_API_KEY"] = api_cfg[model]["api_key"]
+            os.environ["OPENAI_API_BASE"] = api_cfg[model]["api_base"]
 
-            # 设置环境变量
-            os.environ["OPENAI_API_KEY"] = api_key
-            os.environ["OPENAI_API_BASE"] = api_base
+            full_prompt = prompts[service_type].format(text=text)
+            rewritten_text, explanation, full_response = rewrite_text(text, service_type, model, full_prompt)
 
-            try:
-                # 获取完整的Prompt
-                prompt_template = prompts[service_type]
-                full_prompt = prompt_template.format(text=text)
+            display_results(text, rewritten_text, explanation, full_response, full_prompt, debug_mode)
+        except Exception as e:
+            st.error(f"处理过程中出现错误: {str(e)}")
+    elif not text:
+        st.warning("请输入文本后再提交。")
 
-                # 调用润色函数
-                rewritten_text, explanation, full_response = rewrite_text(text, service_type, model, full_prompt)
 
-                # 生成逐字diff
-                word_diff = generate_word_diff(text, rewritten_text)
+def display_results(original_text, rewritten_text, explanation, full_response, full_prompt, debug_mode):
+    word_diff = generate_word_diff(original_text, rewritten_text)
 
-                # 显示差异
-                st.subheader("优化结果对比:")
-                st.markdown(f'<div class="diff-result">{word_diff}</div>', unsafe_allow_html=True)
+    st.subheader("优化结果对比:")
+    st.markdown(f'<div class="diff-result">{word_diff}</div>', unsafe_allow_html=True)
 
-                st.subheader("优化后的文本:")
-                st.code(rewritten_text, language="markdown")
+    st.subheader("优化后的文本:")
+    st.code(rewritten_text, language="markdown")
 
-                st.subheader("修改说明:")
-                st.write(explanation)
+    st.subheader("修改说明:")
+    st.write(explanation)
 
-                # 在调试模式下显示完整的Prompt和LLM输出
-                if debug_mode:
-                    st.subheader("完整Output (调试模式):")
-                    st.code(full_response, language="markdown")
+    if debug_mode:
+        st.subheader("完整Output (调试模式):")
+        st.code(full_response, language="markdown")
 
-                    st.subheader("完整Prompt (调试模式):")
-                    st.code(full_prompt, language="markdown")
-
-            except Exception as e:
-                st.error(f"处理过程中出现错误: {str(e)}")
-        else:
-            st.warning("请输入文本后再提交。")
+        st.subheader("完整Prompt (调试模式):")
+        st.code(full_prompt, language="markdown")
 
 
 if __name__ == "__main__":

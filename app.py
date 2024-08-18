@@ -8,7 +8,7 @@ from academic_rewriter import rewrite_text
 
 
 def load_config():
-    with open("config.yaml", "r") as file:
+    with open("api.yaml", "r") as file:
         return yaml.safe_load(file)
 
 
@@ -44,6 +44,11 @@ def main():
         }
         /* 增大selectbox label的字体 */
         .stSelectbox label {
+            font-size: 24px !important;
+            font-weight: bold;
+        }
+        /* 增大text_area label的字体 */
+        .stTextArea label {
             font-size: 24px !important;
             font-weight: bold;
         }
@@ -83,6 +88,13 @@ def main():
         h3 {
             font-size: 24px !important;
         }
+        .big-font {
+            font-size: 24px !important;
+        }
+        /* 增大markdown框字体 */
+        .element-container .stMarkdown {
+            font-size: 22px;
+        }
     </style>
     """,
         unsafe_allow_html=True,
@@ -94,7 +106,7 @@ def main():
     config = load_config()
 
     # 选择模型
-    model_options = list(config["models"].keys())
+    model_options = list(config.keys())
     model = st.selectbox("请选择要使用的模型:", model_options)
 
     # 选择服务类型
@@ -109,8 +121,8 @@ def main():
     if st.button("提交"):
         if text:
             # 从配置文件中获取API设置
-            api_key = config["models"][model]["api_key"]
-            api_base = config["models"][model]["api_base"]
+            api_key = config[model]["api_key"]
+            api_base = config[model]["api_base"]
 
             # 设置环境变量
             os.environ["OPENAI_API_KEY"] = api_key

@@ -20,7 +20,6 @@
   <img src="images/output_image.png" alt="输出结果" style="width: 45%;">
 </div>
 
-
 ## 🚀 快速开始
 
 ### 安装
@@ -60,6 +59,10 @@
    ```
 
 2. **在浏览器中访问显示的 URL** (通常为 `http://localhost:8501`)
+
+### 调试
+
+当开启「调试模式」时，您可以编辑当前 prompt，但该 prompt 不会保存。
 
 ## 🛠️ 贡献
 

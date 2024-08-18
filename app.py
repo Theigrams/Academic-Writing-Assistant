@@ -19,10 +19,23 @@ def main():
     api_cfg = load_api_config()
     prompts = load_prompts()
 
-    model = st.selectbox("请选择要使用的模型:", list(api_cfg.keys()))
-    service_type = st.selectbox("请选择服务类型:", list(prompts.keys()))
+    # 默认选择 gpt-4o-mini 和 academic_rewriting
+    model_list = list(api_cfg.keys())
+    service_type_list = list(prompts.keys())
+
+    default_model_index = model_list.index("gpt-4o-mini")
+    default_service_type_index = (
+        service_type_list.index("academic_rewriting") if "academic_rewriting" in service_type_list else 0
+    )
+
+    model = st.selectbox("请选择要使用的模型:", model_list, index=default_model_index)
+    service_type = st.selectbox("请选择服务类型:", service_type_list, index=default_service_type_index)
 
     default_text = "The Knuth-Morris-Pratt string searching algorithm is way faster than brute force. It uses a prefix function to skip ahead when a mismatch is found, instead of starting over from the next character in the text. This makes it run in O(n+m) time instead of O(n*m) time, which is a huge improvement when searching through large strings."
+
+    if "translation" in service_type:
+        default_text = "人工智能技术正在迅速发展,并在各个领域得到广泛应用。它不仅能提高生产效率,还能帮助我们解决复杂的问题。然而,我们也需要警惕人工智能可能带来的伦理和隐私问题,确保其发展方向符合人类的长远利益。"
+
     text = st.text_area("请输入您的文本:", value=default_text, height=200)
     debug_mode = st.checkbox("调试模式")
 

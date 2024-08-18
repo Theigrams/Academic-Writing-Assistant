@@ -1,29 +1,48 @@
+import os
+import re
+
 from litellm import completion
 
 
-def rewrite_text(text, service_type, model):
-    # Set different prompts based on service type
-    if service_type == "Academic Style Rewriting":
-        prompt = f"Please rewrite the following text in a more academic style while maintaining the original meaning:\n\n{text}\n\nRewritten text:"
-    elif service_type == "Grammar Correction":
-        prompt = f"Please correct any grammatical errors in the following text while maintaining the original meaning:\n\n{text}\n\nCorrected text:"
-    elif service_type == "Chinese to English Translation":
-        prompt = f"Please translate the following Chinese text into English:\n\n{text}\n\nEnglish translation:"
-    else:
-        return text  # If service type doesn't match, return original text
+def load_prompts():
+    prompts = {}
+    prompts_dir = "prompts"
+    for filename in os.listdir(prompts_dir):
+        if filename.endswith(".md"):
+            service_type = filename[:-3]  # 移除 .md 扩展名
+            with open(os.path.join(prompts_dir, filename), "r", encoding="utf-8") as file:
+                prompts[service_type] = file.read()
+    return prompts
 
-    # Call LLM for text processing
+
+def remove_xml_tags(text):
+    return re.sub(r"<[^>]+>", "", text)
+
+
+def rewrite_text(text, service_type, model, full_prompt):
+    prompts = load_prompts()
+
+    if service_type not in prompts:
+        return text, "服务类型不匹配,返回原始文本", ""
+
     response = completion(
-        model=model,  # Use the model selected by the user
+        model=model,
         messages=[
             {
                 "role": "system",
-                "content": "You are a professional academic editor skilled in improving the language and grammar of academic articles.",
+                "content": "您是一位受人尊敬的学术编辑和语言学家，在各个学科领域都有丰富的学术写作增强经验。您的专长包括改进学术语言、完善语法、确保符合特定领域的惯例，以及在保持学术语气和细微差别的同时进行语言间的翻译。",
             },
-            {"role": "user", "content": prompt},
+            {"role": "user", "content": full_prompt},
         ],
-        max_tokens=1000,  # Adjust as needed
+        max_tokens=4000,
     )
 
-    # Return the processed text
-    return response.choices[0].message.content.strip()
+    full_response = response.choices[0].message.content.strip()
+
+    output_match = re.search(r"<output>(.*?)</output>", full_response, re.DOTALL)
+    explanation_match = re.search(r"<explanation>(.*?)</explanation>", full_response, re.DOTALL)
+
+    output = remove_xml_tags(output_match.group(1).strip()) if output_match else "未提供输出"
+    explanation = remove_xml_tags(explanation_match.group(1).strip()) if explanation_match else "未提供解释"
+
+    return output, explanation, full_response

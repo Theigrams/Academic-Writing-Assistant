@@ -1,10 +1,11 @@
 import difflib
 import os
+import re
 
 import streamlit as st
 import yaml
 
-from academic_rewriter import rewrite_text
+from academic_rewriter import load_prompts, rewrite_text
 
 
 def load_config():
@@ -67,7 +68,7 @@ def main():
         unsafe_allow_html=True,
     )
 
-    st.title("学术论文润色工具")
+    st.title("学术文献优化工具")
 
     # 加载配置
     config = load_config()
@@ -76,14 +77,18 @@ def main():
     model_options = list(config.keys())
     model = st.selectbox("请选择要使用的模型:", model_options)
 
+    # 加载提示词
+    prompts = load_prompts()  # 使用academic_rewriter.py中定义的load_prompts函数
+
     # 选择服务类型
-    service_type = st.selectbox(
-        "请选择服务类型:", ["Academic Style Rewriting", "Grammar Correction", "Chinese to English Translation"]
-    )
+    service_type = st.selectbox("请选择服务类型:", list(prompts.keys()))
 
     # 文本输入，添加默认句子
     default_text = "The cat sat on the mat. It was a sunny day."
     text = st.text_area("请输入您的文本:", value=default_text, height=200)
+
+    # 添加调试模式复选框
+    debug_mode = st.checkbox("调试模式")
 
     if st.button("提交"):
         if text:
@@ -96,19 +101,33 @@ def main():
             os.environ["OPENAI_API_BASE"] = api_base
 
             try:
+                # 获取完整的Prompt
+                prompt_template = prompts[service_type]
+                full_prompt = prompt_template.format(text=text)
+
                 # 调用润色函数
-                rewritten_text = rewrite_text(text, service_type, model)
+                rewritten_text, explanation, full_response = rewrite_text(text, service_type, model, full_prompt)
 
                 # 生成逐字diff
                 word_diff = generate_word_diff(text, rewritten_text)
 
                 # 显示差异
-                st.subheader("对比结果:")
+                st.subheader("优化结果对比:")
                 st.markdown(f'<div class="diff-result">{word_diff}</div>', unsafe_allow_html=True)
 
-                # 显示完整的润色后文本
-                st.subheader("润色后的完整文本:")
+                st.subheader("优化后的文本:")
                 st.code(rewritten_text, language="markdown")
+
+                st.subheader("修改说明:")
+                st.write(explanation)
+
+                # 在调试模式下显示完整的Prompt和LLM输出
+                if debug_mode:
+                    st.subheader("完整Output (调试模式):")
+                    st.code(full_response, language="markdown")
+
+                    st.subheader("完整Prompt (调试模式):")
+                    st.code(full_prompt, language="markdown")
 
             except Exception as e:
                 st.error(f"处理过程中出现错误: {str(e)}")

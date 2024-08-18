@@ -33,67 +33,34 @@ def main():
     st.markdown(
         """
     <style>
-        html, body, [class*="css"] {
-            font-size: 20px;
-        }
-        .stTextInput > div > div > input,
-        .stTextArea textarea,
-        .stSelectbox > div > div > select,
-        .stButton > button {
-            font-size: 20px;
-        }
-        /* 增大selectbox label的字体 */
-        .stSelectbox label {
-            font-size: 24px !important;
-            font-weight: bold;
-        }
-        /* 增大text_area label的字体 */
-        .stTextArea label {
-            font-size: 24px !important;
-            font-weight: bold;
-        }
+        /* 差异结果样式 */
         .diff-result {
             font-family: monospace;
             white-space: pre-wrap;
             line-height: 1.5;
-            font-size: 18px;
+            font-size: 1.0rem;
         }
         .diff-result ins {
-            color: green;
-            background-color: #e6ffe6;
+            color: #28a745;
+            background-color: #e6ffec;
             text-decoration: none;
         }
         .diff-result del {
-            color: red;
-            background-color: #ffe6e6;
+            color: #d73a49;
+            background-color: #ffeef0;
             text-decoration: line-through;
         }
+        
+        /* 深色模式适配 */
         @media (prefers-color-scheme: dark) {
             .diff-result ins {
-                color: #80e980;
+                color: #85e89d;
                 background-color: transparent;
             }
             .diff-result del {
-                color: #f33535;
+                color: #f97583;
                 background-color: transparent;
             }
-        }
-        /* 增大标题字体 */
-        .stTitle {
-            font-size: 32px !important;
-        }
-        h2 {
-            font-size: 28px !important;
-        }
-        h3 {
-            font-size: 24px !important;
-        }
-        .big-font {
-            font-size: 24px !important;
-        }
-        /* 增大markdown框字体 */
-        .element-container .stMarkdown {
-            font-size: 22px;
         }
     </style>
     """,

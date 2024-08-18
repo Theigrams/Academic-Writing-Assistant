@@ -39,12 +39,16 @@ def main():
     text = st.text_area("请输入您的文本:", value=default_text, height=200)
     debug_mode = st.checkbox("调试模式")
 
+    if debug_mode:
+        prompt = st.text_area("编辑Prompt:", value=prompts[service_type], height=300)
+    else:
+        prompt = prompts[service_type]
+
     if st.button("提交") and text:
         try:
             os.environ["OPENAI_API_KEY"] = api_cfg[model]["api_key"]
             os.environ["OPENAI_API_BASE"] = api_cfg[model]["api_base"]
 
-            prompt = prompts[service_type]
             rewritten_text, explanation, full_response = rewrite_text(text, prompt, model)
 
             display_results(text, rewritten_text, explanation, full_response, prompt, debug_mode)

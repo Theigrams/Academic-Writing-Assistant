@@ -14,7 +14,7 @@ def load_api_config():
 
 def main():
     set_page_style()
-    st.title("学术论文GPT")
+    st.title("Academic Writing Assistant")
 
     api_cfg = load_api_config()
     prompts = load_prompts()
@@ -67,10 +67,10 @@ def display_results(original_text, rewritten_text, explanation, full_response, p
     st.write(explanation)
 
     if debug_mode:
-        st.subheader("完整Output (调试模式):")
+        st.subheader("Output (调试模式):")
         st.code(full_response, language="markdown")
 
-        st.subheader("完整Prompt (调试模式):")
+        st.subheader("Prompt (调试模式):")
         st.code(prompt, language="markdown")
 
 

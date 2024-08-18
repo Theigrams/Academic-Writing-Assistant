@@ -64,6 +64,7 @@ Example 2:
 </explanation>
 </examples>
 
+Now, please translate the following text into English:
 <input>
 {text}
 </input>

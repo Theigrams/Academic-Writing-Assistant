@@ -64,6 +64,7 @@ Example 2:
 </explanation>
 </examples>
 
+Now, please rewrite the following text into an academic style:
 <input>
 {text}
 </input>

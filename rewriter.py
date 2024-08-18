@@ -1,9 +1,11 @@
 import os
 import re
+from functools import lru_cache
 
 from litellm import completion
 
 
+@lru_cache(maxsize=1)
 def load_prompts():
     prompts = {}
     prompts_dir = "prompts"

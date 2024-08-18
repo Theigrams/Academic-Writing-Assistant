@@ -13,6 +13,14 @@
 - **🔍 详细解释**: 提供 AI 修改的具体理由，帮助深入理解优化逻辑与方法。
 - **🎯 自定义 Prompt**: 根据个人需求定制专属 prompt，满足不同写作场景的需求。
 
+## 🖼️ 演示
+
+<div style="display: flex; justify-content: space-around;">
+  <img src="images/input_image.png" alt="输入界面" style="width: 45%;">
+  <img src="images/output_image.png" alt="输出结果" style="width: 45%;">
+</div>
+
+
 ## 🚀 快速开始
 
 ### 安装
@@ -56,7 +64,6 @@
 ## 🛠️ 贡献
 
 当前 prompts 还比较粗糙，欢迎大家贡献自己的 prompts，一起完善这个项目。
-
 
 ## 📄 许可证
 

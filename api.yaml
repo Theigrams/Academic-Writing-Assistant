@@ -2,11 +2,11 @@ gpt-4o:
   api_key: sk-abcdef1234567890abcdef1234567890
   api_base: https://api.openai.com/v1
 gpt-4o-mini:
-  api_key: sk-9876543210abcdef9876543210abcdef
+  api_key: sk-abcdef1234567890abcdef1234567890
   api_base: https://api.openai.com/v1
-gpt-4-turbo:
-  api_key: sk-1234567890abcdef1234567890abcdef
+openai/claude-3-5-sonnet-20240620:
+  api_key: sk-abcdef1234567890abcdef1234567890
   api_base: https://api.openai.com/v1
-custom-model-1:
-  api_key: sk-custom1234567890abcdef1234567890
-  api_base: https://custom-api.example.com/v1
+openai/claude-3-opus-20240229:
+  api_key: sk-abcdef1234567890abcdef1234567890
+  api_base: https://api.openai.com/v1

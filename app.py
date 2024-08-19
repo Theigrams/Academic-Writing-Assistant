@@ -4,7 +4,7 @@ import streamlit as st
 import yaml
 
 from rewriter import load_prompts, rewrite_text
-from utils import generate_word_diff, set_page_style
+from utils import generate_word_diff, set_page_config, set_page_style
 
 
 def load_api_config():
@@ -13,7 +13,12 @@ def load_api_config():
 
 
 def main():
+    # 设置页面配置
+    set_page_config()
+
+    # 设置页面样式
     set_page_style()
+
     st.title("Academic Writing Assistant")
 
     api_cfg = load_api_config()
@@ -43,7 +48,7 @@ def main():
     else:
         prompt = prompts[service_type]
 
-    if st.button("提交") and text:
+    if st.button("提交", type="primary") and text:
         try:
             os.environ["OPENAI_API_KEY"] = api_cfg[model]["api_key"]
             os.environ["OPENAI_API_BASE"] = api_cfg[model]["api_base"]

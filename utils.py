@@ -23,6 +23,7 @@ def set_page_style():
     st.markdown(
         """
     <style>
+        /* Existing styles */
         .diff-result {
             font-family: monospace;
             white-space: pre-wrap;
@@ -50,7 +51,16 @@ def set_page_style():
                 background-color: transparent;
             }
         }
+
+        /* New styles */
+        h1, h2, h3 {
+            color: #1e3a8a;
+        }
     </style>
     """,
         unsafe_allow_html=True,
     )
+
+
+def set_page_config():
+    st.set_page_config(page_title="学术写作助手", page_icon="✍️", initial_sidebar_state="expanded")

@@ -55,7 +55,7 @@ def add_new_model(api_cfg):
         default_api_base = ""
 
     new_model = st.text_input(
-        "���模型名称",
+        "模型名称",
         key="new_model_name",
         value=default_name if not st.session_state.new_model_added else "",
     )
@@ -103,12 +103,16 @@ def prompts_config_page():
     if st.button("保存 Prompt"):
         save_prompt(selected_prompt, edited_prompt)
         st.success(f"{selected_prompt} Prompt 已成功保存")
+        st.rerun()
+
+    st.header("添加新 Prompt")
+    new_prompt_name = st.text_input("新 Prompt 名称:")
+    new_prompt_content = st.text_area("新 Prompt 内容:", height=200)
 
     if st.button("添加新 Prompt"):
-        new_prompt_name = st.text_input("新 Prompt 名称:")
         if new_prompt_name and new_prompt_name not in prompts:
-            save_prompt(new_prompt_name, "")
-            st.success(f"新 Prompt {new_prompt_name} 已创建")
+            save_prompt(new_prompt_name, new_prompt_content)
+            st.success(f"新 Prompt {new_prompt_name} 已创建并保存")
             st.rerun()
         elif new_prompt_name in prompts:
             st.warning("该 Prompt 名称已存在")

@@ -56,6 +56,20 @@ def set_page_style():
         h1, h2, h3 {
             color: #1e3a8a;
         }
+
+        /* Sidebar style adjustments */
+        .css-1d391kg {
+            padding-top: 1rem;
+            padding-right: 0.5rem;
+            padding-left: 0.5rem;
+        }
+        .css-1d391kg .block-container {
+            padding-top: 1rem;
+        }
+        /* Adjust sidebar width */
+        .css-1q1n0ol {
+            max-width: 14rem;
+        }
     </style>
     """,
         unsafe_allow_html=True,

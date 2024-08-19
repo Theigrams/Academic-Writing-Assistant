@@ -12,6 +12,83 @@ def load_api_config():
         return yaml.safe_load(file)
 
 
+def save_api_config(config):
+    with open("api.yaml", "w") as file:
+        yaml.dump(config, file)
+
+
+def api_config_page():
+    st.title("API 配置管理")
+
+    st.header("添加新模型")
+    add_new_model(load_api_config())
+
+    st.header("当前API配置")
+    api_cfg = load_api_config()
+    for model, config in api_cfg.items():
+        st.subheader(f"模型: {model}")
+        st.json(config)
+
+        col1, col2 = st.columns(2)
+        with col1:
+            if st.button(f"复制 {model}", key=f"copy_{model}"):
+                st.session_state.copying_model = model
+        with col2:
+            if st.button(f"删除 {model}", key=f"delete_{model}"):
+                del api_cfg[model]
+                save_api_config(api_cfg)
+                st.success(f"模型 {model} 已成功删除")
+                st.rerun()
+
+
+def add_new_model(api_cfg):
+    if "new_model_added" not in st.session_state:
+        st.session_state.new_model_added = False
+
+    if "copying_model" in st.session_state:
+        default_name = f"{st.session_state.copying_model}_copy"
+        default_api_key = api_cfg[st.session_state.copying_model]["api_key"]
+        default_api_base = api_cfg[st.session_state.copying_model]["api_base"]
+    else:
+        default_name = ""
+        default_api_key = ""
+        default_api_base = ""
+
+    new_model = st.text_input(
+        "新模型名称",
+        key="new_model_name",
+        value=default_name if not st.session_state.new_model_added else "",
+    )
+    new_api_key = st.text_input(
+        "API Key",
+        key="new_api_key",
+        value=default_api_key if not st.session_state.new_model_added else "",
+    )
+    new_api_base = st.text_input(
+        "API Base",
+        key="new_api_base",
+        value=default_api_base if not st.session_state.new_model_added else "",
+    )
+
+    if st.button("添加模型"):
+        if new_model and new_api_key and new_api_base:
+            api_cfg[new_model] = {"api_key": new_api_key, "api_base": new_api_base}
+            save_api_config(api_cfg)
+            st.success(f"新模型 {new_model} 已成功添加")
+
+            # 设置标志以在下次渲染时清空字段
+            st.session_state.new_model_added = True
+            if "copying_model" in st.session_state:
+                del st.session_state.copying_model
+
+            st.rerun()
+        else:
+            st.warning("请填写所有字段")
+    else:
+        # 重置标志
+        st.session_state.new_model_added = False
+
+
 def main():
     # 设置页面配置
     set_page_config()
@@ -19,6 +96,16 @@ def main():
     # 设置页面样式
     set_page_style()
 
+    st.sidebar.title("导航")
+    page = st.sidebar.radio("选择页面", ["主页", "API 配置"])
+
+    if page == "主页":
+        home_page()
+    elif page == "API配置":
+        api_config_page()
+
+
+def home_page():
     st.title("Academic Writing Assistant")
 
     api_cfg = load_api_config()

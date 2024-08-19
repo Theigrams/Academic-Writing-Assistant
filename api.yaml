@@ -1,15 +1,12 @@
 gpt-4o:
-  api_base: https://ps.gptuu.com/v1
-  api_key: sk-rP8Iq2VAA9iQQO3429C89436AfE9401fA613CfB16d4b8045
+  api_key: sk-abcdef1234567890abcdef1234567890
+  api_base: https://api.openai.com/v1
 gpt-4o-mini:
-  api_base: https://ps.gptuu.com/v1
-  api_key: sk-rP8Iq2VAA9iQQO3429C89436AfE9401fA613CfB16d4b8045
+  api_key: sk-abcdef1234567890abcdef1234567890
+  api_base: https://api.openai.com/v1
 openai/claude-3-5-sonnet-20240620:
-  api_base: https://opus.gptuu.com/v1
-  api_key: sk-RDQw5xtvpskKosE06e16554774684b98Bd3a4197955e5c7a
+  api_key: sk-abcdef1234567890abcdef1234567890
+  api_base: https://api.openai.com/v1
 openai/claude-3-opus-20240229:
-  api_base: https://opus.gptuu.com/v1
-  api_key: sk-RDQw5xtvpskKosE06e16554774684b98Bd3a4197955e5c7a
-openai/claude-3-opus-20240229_copy:
-  api_base: https://opus.gptuu.com/v1
-  api_key: sk-RDQw5xtvpskKosE06e16554774684b98Bd3a4197955e5c7a
+  api_key: sk-abcdef1234567890abcdef1234567890
+  api_base: https://api.openai.com/v1

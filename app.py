@@ -101,7 +101,7 @@ def main():
 
     if page == "主页":
         home_page()
-    elif page == "API配置":
+    elif page == "API 配置":
         api_config_page()
 
 

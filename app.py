@@ -3,7 +3,7 @@ import os
 import streamlit as st
 import yaml
 
-from rewriter import load_prompts, rewrite_text, save_prompt
+from rewriter import delete_prompt, load_prompts, rewrite_text, save_prompt
 from utils import generate_word_diff, set_page_config, set_page_style
 
 
@@ -100,10 +100,20 @@ def prompts_config_page():
     current_prompt = prompts[selected_prompt]
     edited_prompt = st.text_area("编辑 Prompt:", value=current_prompt, height=300)
 
-    if st.button("保存 Prompt"):
-        save_prompt(selected_prompt, edited_prompt)
-        st.success(f"{selected_prompt} Prompt 已成功保存")
-        st.rerun()
+    col1, col2 = st.columns(2)
+    with col1:
+        if st.button("保存 Prompt"):
+            save_prompt(selected_prompt, edited_prompt)
+            st.success(f"{selected_prompt} Prompt 已成功保存")
+            st.rerun()
+    with col2:
+        if st.button("删除 Prompt"):
+            if len(prompts) > 1:  # 确保至少保留一个 Prompt
+                delete_prompt(selected_prompt)
+                st.success(f"{selected_prompt} Prompt 已成功删除")
+                st.rerun()
+            else:
+                st.error("无法删除最后一个 Prompt")
 
     st.header("添加新 Prompt")
     new_prompt_name = st.text_input("新 Prompt 名称:")

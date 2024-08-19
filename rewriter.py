@@ -53,3 +53,13 @@ def save_prompt(prompt_name, content):
 
     # 清除缓存，以便在下次加载时获取更新后的 prompts
     load_prompts.cache_clear()
+
+def delete_prompt(prompt_name):
+    prompts_dir = "prompts"
+    file_path = os.path.join(prompts_dir, f"{prompt_name}.md")
+    if os.path.exists(file_path):
+        os.remove(file_path)
+        # 清除缓存，以便在下次加载时获取更新后的 prompts
+        load_prompts.cache_clear()
+    else:
+        raise FileNotFoundError(f"Prompt 文件 {prompt_name}.md 不存在")

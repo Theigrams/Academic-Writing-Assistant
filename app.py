@@ -21,8 +21,11 @@ def save_api_config(config):
 def api_config_page():
     st.title("API 配置管理")
 
+    # 创建一个空的占位符用于显示临时消息
+    message_placeholder = st.empty()
+
     st.header("添加新模型")
-    add_new_model(load_api_config())
+    add_new_model(load_api_config(), message_placeholder)
 
     st.header("当前API配置")
     api_cfg = load_api_config()
@@ -34,60 +37,49 @@ def api_config_page():
         with col1:
             if st.button(f"复制 {model}", key=f"copy_{model}"):
                 st.session_state.copying_model = model
+                st.rerun()
         with col2:
             if st.button(f"删除 {model}", key=f"delete_{model}"):
                 del api_cfg[model]
                 save_api_config(api_cfg)
-                st.success(f"模型 {model} 已成功删除")
                 st.rerun()
 
 
-def add_new_model(api_cfg):
-    if "new_model_added" not in st.session_state:
-        st.session_state.new_model_added = False
+def add_new_model(api_cfg, message_placeholder):
+    if "clear_new_model" not in st.session_state:
+        st.session_state.clear_new_model = False
 
-    if "copying_model" in st.session_state:
-        default_name = f"{st.session_state.copying_model}_copy"
-        default_api_key = api_cfg[st.session_state.copying_model]["api_key"]
-        default_api_base = api_cfg[st.session_state.copying_model]["api_base"]
+    if st.session_state.clear_new_model:
+        new_model = st.text_input("模型名称", key="new_model_name", value="")
+        new_api_key = st.text_input("API Key", key="new_api_key", value="")
+        new_api_base = st.text_input("API Base", key="new_api_base", value="")
+        st.session_state.clear_new_model = False
     else:
-        default_name = ""
-        default_api_key = ""
-        default_api_base = ""
+        if "copying_model" in st.session_state:
+            default_name = f"{st.session_state.copying_model}_copy"
+            default_api_key = api_cfg[st.session_state.copying_model]["api_key"]
+            default_api_base = api_cfg[st.session_state.copying_model]["api_base"]
+        else:
+            default_name = ""
+            default_api_key = ""
+            default_api_base = ""
 
-    new_model = st.text_input(
-        "模型名称",
-        key="new_model_name",
-        value=default_name if not st.session_state.new_model_added else "",
-    )
-    new_api_key = st.text_input(
-        "API Key",
-        key="new_api_key",
-        value=default_api_key if not st.session_state.new_model_added else "",
-    )
-    new_api_base = st.text_input(
-        "API Base",
-        key="new_api_base",
-        value=default_api_base if not st.session_state.new_model_added else "",
-    )
+        new_model = st.text_input("模型名称", key="new_model_name", value=default_name)
+        new_api_key = st.text_input("API Key", key="new_api_key", value=default_api_key)
+        new_api_base = st.text_input("API Base", key="new_api_base", value=default_api_base)
 
     if st.button("添加模型"):
         if new_model and new_api_key and new_api_base:
             api_cfg[new_model] = {"api_key": new_api_key, "api_base": new_api_base}
             save_api_config(api_cfg)
-            st.success(f"新模型 {new_model} 已成功添加")
-
-            # 设置标志以在下次渲染时清空字段
-            st.session_state.new_model_added = True
+            show_success_message(message_placeholder, f"新模型 {new_model} 已成功添加")
+            st.session_state.clear_new_model = True
             if "copying_model" in st.session_state:
                 del st.session_state.copying_model
-
+            time.sleep(1)
             st.rerun()
         else:
             st.warning("请填写所有字段")
-    else:
-        # 重置标志
-        st.session_state.new_model_added = False
 
 
 def prompts_config_page():
@@ -122,13 +114,25 @@ def prompts_config_page():
                 st.error("无法删除最后一个 Prompt")
 
     st.header("添加新 Prompt")
-    new_prompt_name = st.text_input("新 Prompt 名称:")
-    new_prompt_content = st.text_area("新 Prompt 内容:", height=200)
+
+    # 使用 session_state 来存储新 Prompt 的名称和内容，以及一个清空标志
+    if "clear_new_prompt" not in st.session_state:
+        st.session_state.clear_new_prompt = False
+
+    if st.session_state.clear_new_prompt:
+        new_prompt_name = st.text_input("新 Prompt 名称:", key="new_prompt_name", value="")
+        new_prompt_content = st.text_area("新 Prompt 内容:", key="new_prompt_content", height=200, value="")
+        st.session_state.clear_new_prompt = False
+    else:
+        new_prompt_name = st.text_input("新 Prompt 名称:", key="new_prompt_name")
+        new_prompt_content = st.text_area("新 Prompt 内容:", key="new_prompt_content", height=200)
 
     if st.button("添加新 Prompt"):
         if new_prompt_name and new_prompt_name not in prompts:
             save_prompt(new_prompt_name, new_prompt_content)
             show_success_message(message_placeholder, f"新 Prompt {new_prompt_name} 已创建并保存")
+            # 设置清空标志
+            st.session_state.clear_new_prompt = True
             time.sleep(1)  # 等待1秒，让用户看到消息
             st.rerun()
         elif new_prompt_name in prompts:
@@ -179,7 +183,7 @@ def home_page():
     default_text = "The Knuth-Morris-Pratt string searching algorithm is way faster than brute force. It uses a prefix function to skip ahead when a mismatch is found, instead of starting over from the next character in the text."
 
     if "translation" in service_type:
-        default_text = "人工智能技术正在迅速发展,并在各个领域得到广泛应用。它不仅能提高生产效率,还能帮助我们解决复杂的问题。���而,我们也需要警惕人工智能可能带来的伦理和隐私问题,确保其发展方向符合人类的长远利益。"
+        default_text = "人工智能技术正在迅速发展,并在各个领域得到广泛应用。它不仅能提高生产效率,还能帮助我们解决复杂的问题。而,我们也需要警惕人工智能可能带来的伦理和隐私问题,确保其发展方向符合人类的长远利益。"
 
     text = st.text_area("请输入您的文本:", value=default_text, height=100)
     debug_mode = st.checkbox("调试模式")
@@ -200,7 +204,7 @@ def home_page():
         except Exception as e:
             st.error(f"处理过程中出现错误: {str(e)}")
     elif not text:
-        st.warning("请输入文本后再提交。")
+        st.warning("请入文本后再提交。")
 
 
 def display_results(original_text, rewritten_text, explanation, full_response, prompt, debug_mode):

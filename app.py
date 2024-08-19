@@ -137,17 +137,26 @@ def add_new_prompt(message_placeholder: st.empty) -> None:
 
 
 def main() -> None:
+    show_api = st.secrets.get("show_api", False)
+    show_prompts = st.secrets.get("show_prompts", True)  # 默认为 True
+
     set_page_config()
     set_page_style()
 
     st.sidebar.title("导航")
-    page = st.sidebar.radio("选择页面", ["主页", "API 配置", "Prompts 配置"])
+    pages = ["主页"]
+    if show_prompts:
+        pages.append("Prompts 配置")
+    if show_api:
+        pages.append("API 配置")
+
+    page = st.sidebar.radio("选择页面", pages)
 
     if page == "主页":
         home_page()
-    elif page == "API 配置":
+    elif page == "API 配置" and show_api:
         api_config_page()
-    elif page == "Prompts 配置":
+    elif page == "Prompts 配置" and show_prompts:
         prompts_config_page()
 
 
@@ -204,7 +213,7 @@ def display_results(
     st.subheader("优化结果对比:")
     st.markdown(f'<div class="diff-result">{word_diff}</div>', unsafe_allow_html=True)
 
-    st.subheader("优化后的文本:")
+    st.subheader("优化后文本:")
     st.code(rewritten_text, language="markdown")
 
     st.subheader("修改说明:")

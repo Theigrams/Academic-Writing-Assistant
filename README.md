@@ -36,20 +36,6 @@
    pip install -r requirements.txt
    ```
 
-### 配置
-
-1. **API 设置**:
-   编辑 `api.yaml` 文件，填入您的 API 信息:
-
-   ```yaml
-   model_name:
-     api_key: "your-api-key"
-     api_base: "https://api.example.com"
-   ```
-
-2. **Prompt 准备**:
-   在 `prompts` 目录下创建 `.md` 文件，为不同类型的服务设置专属 prompt。
-
 ### 运行
 
 1. **启动应用**:
@@ -60,13 +46,13 @@
 
 2. **在浏览器中访问显示的 URL** (通常为 `http://localhost:8501`)
 
-### 调试
+3. **配置 API 和 Prompt**
 
-当开启「调试模式」时，您可以编辑当前 prompt，但该 prompt 不会保存。
+> 💡 **Tip**: 当开启「调试模式」时，您可以编辑当前的 prompt，但该 prompt 不会保存。
 
 ## 🛠️ 贡献
 
-当前 prompts 还比较粗糙，欢迎大家贡献自己的 prompts，一起完善这个项目。
+我们欢迎各种贡献，尤其是关于 prompts 的优化。如果您有自己的 prompts 想法或改进建议，请提交 PR 一起完善这个项目。
 
 ## 📄 许可证
 

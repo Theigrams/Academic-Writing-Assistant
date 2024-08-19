@@ -1,4 +1,5 @@
 import os
+import time
 
 import streamlit as st
 import yaml
@@ -100,17 +101,22 @@ def prompts_config_page():
     current_prompt = prompts[selected_prompt]
     edited_prompt = st.text_area("编辑 Prompt:", value=current_prompt, height=300)
 
+    # 创建一个空的占位符用于显示临时消息
+    message_placeholder = st.empty()
+
     col1, col2 = st.columns(2)
     with col1:
         if st.button("保存 Prompt"):
             save_prompt(selected_prompt, edited_prompt)
-            st.success(f"{selected_prompt} Prompt 已成功保存")
+            show_success_message(message_placeholder, f"{selected_prompt} Prompt 已成功保存")
+            time.sleep(1)  # 等待1秒，让用户看到消息
             st.rerun()
     with col2:
         if st.button("删除 Prompt"):
             if len(prompts) > 1:  # 确保至少保留一个 Prompt
                 delete_prompt(selected_prompt)
-                st.success(f"{selected_prompt} Prompt 已成功删除")
+                show_success_message(message_placeholder, f"{selected_prompt} Prompt 已成功删除")
+                time.sleep(1)  # 等待1秒，让用户看到消息
                 st.rerun()
             else:
                 st.error("无法删除最后一个 Prompt")
@@ -122,12 +128,17 @@ def prompts_config_page():
     if st.button("添加新 Prompt"):
         if new_prompt_name and new_prompt_name not in prompts:
             save_prompt(new_prompt_name, new_prompt_content)
-            st.success(f"新 Prompt {new_prompt_name} 已创建并保存")
+            show_success_message(message_placeholder, f"新 Prompt {new_prompt_name} 已创建并保存")
+            time.sleep(1)  # 等待1秒，让用户看到消息
             st.rerun()
         elif new_prompt_name in prompts:
             st.warning("该 Prompt 名称已存在")
         else:
             st.warning("请输入有效的 Prompt 名称")
+
+
+def show_success_message(placeholder, message):
+    placeholder.success(message)
 
 
 def main():
@@ -168,7 +179,7 @@ def home_page():
     default_text = "The Knuth-Morris-Pratt string searching algorithm is way faster than brute force. It uses a prefix function to skip ahead when a mismatch is found, instead of starting over from the next character in the text."
 
     if "translation" in service_type:
-        default_text = "人工智能技术正在迅速发展,并在各个领域得到广泛应用。它不仅能提高生产效率,还能帮助我们解决复杂的问题。然而,我们也需要警惕人工智能可能带来的伦理和隐私问题,确保其发展方向符合人类的长远利益。"
+        default_text = "人工智能技术正在迅速发展,并在各个领域得到广泛应用。它不仅能提高生产效率,还能帮助我们解决复杂的问题。���而,我们也需要警惕人工智能可能带来的伦理和隐私问题,确保其发展方向符合人类的长远利益。"
 
     text = st.text_area("请输入您的文本:", value=default_text, height=100)
     debug_mode = st.checkbox("调试模式")

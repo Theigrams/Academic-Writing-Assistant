@@ -3,7 +3,7 @@ import os
 import streamlit as st
 import yaml
 
-from rewriter import load_prompts, rewrite_text
+from rewriter import load_prompts, rewrite_text, save_prompt
 from utils import generate_word_diff, set_page_config, set_page_style
 
 
@@ -55,7 +55,7 @@ def add_new_model(api_cfg):
         default_api_base = ""
 
     new_model = st.text_input(
-        "新模型名称",
+        "���模型名称",
         key="new_model_name",
         value=default_name if not st.session_state.new_model_added else "",
     )
@@ -89,6 +89,33 @@ def add_new_model(api_cfg):
         st.session_state.new_model_added = False
 
 
+def prompts_config_page():
+    st.title("Prompts 配置管理")
+
+    prompts = load_prompts()
+    service_type_list = list(prompts.keys())
+
+    selected_prompt = st.selectbox("选择要编辑的 Prompt:", service_type_list)
+
+    current_prompt = prompts[selected_prompt]
+    edited_prompt = st.text_area("编辑 Prompt:", value=current_prompt, height=300)
+
+    if st.button("保存 Prompt"):
+        save_prompt(selected_prompt, edited_prompt)
+        st.success(f"{selected_prompt} Prompt 已成功保存")
+
+    if st.button("添加新 Prompt"):
+        new_prompt_name = st.text_input("新 Prompt 名称:")
+        if new_prompt_name and new_prompt_name not in prompts:
+            save_prompt(new_prompt_name, "")
+            st.success(f"新 Prompt {new_prompt_name} 已创建")
+            st.rerun()
+        elif new_prompt_name in prompts:
+            st.warning("该 Prompt 名称已存在")
+        else:
+            st.warning("请输入有效的 Prompt 名称")
+
+
 def main():
     # 设置页面配置
     set_page_config()
@@ -97,12 +124,14 @@ def main():
     set_page_style()
 
     st.sidebar.title("导航")
-    page = st.sidebar.radio("选择页面", ["主页", "API 配置"])
+    page = st.sidebar.radio("选择页面", ["主页", "API 配置", "Prompts 配置"])
 
     if page == "主页":
         home_page()
     elif page == "API 配置":
         api_config_page()
+    elif page == "Prompts 配置":
+        prompts_config_page()
 
 
 def home_page():

@@ -43,3 +43,13 @@ def rewrite_text(text, prompt, model):
     explanation = remove_xml_tags(explanation_match.group(1).strip()) if explanation_match else "未提供解释"
 
     return output, explanation, full_response
+
+
+def save_prompt(prompt_name, content):
+    prompts_dir = "prompts"
+    file_path = os.path.join(prompts_dir, f"{prompt_name}.md")
+    with open(file_path, "w", encoding="utf-8") as file:
+        file.write(content)
+
+    # 清除缓存，以便在下次加载时获取更新后的 prompts
+    load_prompts.cache_clear()
